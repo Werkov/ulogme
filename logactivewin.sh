@@ -12,6 +12,16 @@ waittime="2" # number of seconds between executions of loop
 maxtime="600" # if last write happened more than this many seconds ago, write even if no window title changed
 #------------------------------
 
+TITLE_YAKUAKE="Yakuake"
+function yakuake_title {
+	dst=org.kde.yakuake
+	sid=`dbus-send --print-reply=literal --type=method_call --dest=$dst \
+		/yakuake/sessions ${dst}.activeSessionId | cut -d" " -f 5`
+	title=`dbus-send --print-reply=literal --type=method_call --dest=$dst \
+		/yakuake/tabs ${dst}.tabTitle int32:$sid | sed 's/^[^"]*"\(.*\)"/\1/'`
+	echo "$TITLE_YAKUAKE - $title"
+}
+
 mkdir -p logs
 last_write="0"
 lasttitle=""
@@ -24,6 +34,10 @@ do
 	else 
 		id=$(xdotool getactivewindow)
 		curtitle=$(wmctrl -lpG | while read -a a; do w=${a[0]}; if (($((16#${w:2}))==id)) ; then echo "${a[@]:8}"; break; fi; done)
+	fi
+
+	if [ "$curtitle" == "$TITLE_YAKUAKE" ] ; then
+		curtitle=`yakuake_title`
 	fi
 
 	perform_write=false
