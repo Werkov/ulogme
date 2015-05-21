@@ -8,7 +8,7 @@ from export_events import updateEvents
 from rewind7am import rewindTime
 
 # Port settings
-IP = ""
+IP = "127.0.0.1"
 if len(sys.argv) > 1:
   PORT = int(sys.argv[1])
 else:
